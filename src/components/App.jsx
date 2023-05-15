@@ -17,10 +17,11 @@ export default class App extends Component {
     status: 'idle',
     page: 1,
     query: '',
-    totalHits: null,
+    totalHits: 0,
   };
 
-  fetchImg = () => {
+
+fetchImg = () => {
     return fetch(
       `${this.state.URL}?q=${this.state.query}&page=${this.state.page}&key=${this.state.API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
     )
@@ -50,19 +51,18 @@ export default class App extends Component {
       .catch(error => this.setState({ error, status: 'rejected' }));
   };
 
+
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.query !== prevState.query) {
-      this.setState({ status: 'pending', pictures: [], page: 1 });
+  if (this.state.query !== prevState.query) {
+    this.setState({ status: 'pending', pictures: [], totalHits: 0, page: 1 }, () => {
       this.fetchImg();
-    }
-    if (
-      this.state.query === prevState.query &&
-      this.state.page !== prevState.page
-    ) {
-      this.setState({ status: 'pending' });
+    });
+  } else if (this.state.page !== prevState.page && this.state.page !== 1) {
+    this.setState({ status: 'pending' }, () => {
       this.fetchImg();
-    }
+    });
   }
+}
 
   processSubmit = query => {
     this.setState({ query });
